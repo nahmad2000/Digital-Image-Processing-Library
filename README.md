@@ -2,8 +2,6 @@
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://digital-image-processing-library-nahmad.streamlit.app/)
 
-**Try it live:** 👉 [https://digital-image-processing-library-nahmad.streamlit.app/](https://digital-image-processing-library-nahmad.streamlit.app/)
-
 ## What is DIP-Lib?
 
 DIP-Lib is an easy-to-use web application that brings common image processing tools together in one place. Think of it as a visual laboratory where you can experiment with **eight core digital image processing functionalities** and see the results instantly!
@@ -14,6 +12,18 @@ Whether you're learning about image processing, want to quickly test algorithms,
 * **Experiment quickly:** Stack multiple operations (like noise reduction followed by edge detection), reorder them, or remove them to compare results.
 * **Understand the process:** Visualize the output of each step in your custom image processing pipeline.
 
+---
+## 🚀 Live Demo
+
+**➡️ [Try the Live Demo!]((https://digital-image-processing-library-nahmad.streamlit.app/)**
+
+*(No installation required!)*
+
+## 🖼️ Sample Outputs
+
+![Demo 1](images/demo1.png) 
+![Demo 2](images/demo2.png)
+![Demo 3](images/demo3.png)
 ---
 
 ## How to Use the Live App
