@@ -4,7 +4,7 @@
 
 ## What is DIP-Lib?
 
-DIP-Lib is an easy-to-use web application that brings common image processing tools together in one place. Think of it as a visual laboratory where you can experiment with **eight core digital image processing functionalities** and see the results instantly!
+DIP-Lib is an easy-to-use web application that brings common image processing tools together in one place. Think of it as a visual laboratory where you can experiment with **nine core digital image processing functionalities** and see the results instantly!
 
 Whether you're learning about image processing, want to quickly test algorithms, or need a tool for a presentation, DIP-Lib helps you:
 
@@ -21,7 +21,7 @@ Whether you're learning about image processing, want to quickly test algorithms,
 
 ## 🖼️ Sample Outputs
 
-![Demo 1](images/demo1.png) 
+![Demo 1](images/demo1.png)
 ![Demo 2](images/demo2.png)
 ![Demo 3](images/demo3.png)
 ---
@@ -44,7 +44,7 @@ Using DIP-Lib is simple:
 
 ## Core Modules Included
 
-You can experiment with these 8 image processing techniques:
+You can experiment with these 9 image processing techniques:
 
 * **Downsampling & Interpolation:** See how resizing images affects quality using different algorithms.
 * **Geometric Transformations:** Rotate, scale, translate, and shear your images.
@@ -54,6 +54,7 @@ You can experiment with these 8 image processing techniques:
 * **Edge Detection:** Compare popular edge detection algorithms (Sobel, Scharr, Laplacian, Canny) side-by-side.
 * **Sharpening:** Enhance image details and edges using Unsharp Masking.
 * **Thresholding:** Convert images to binary (black and white) based on pixel intensity using global or adaptive methods.
+* **Color Space Conversion:** Convert images between different color spaces (like BGR, RGB, HSV, LAB) and view individual channels.
 
 ## Running Locally (Optional)
 
@@ -61,23 +62,27 @@ If you want to run this application on your own computer:
 
 1.  **Clone the Repository:**
     ```bash
-    git clone https://github.com/nahmad2000/Digital-Image-Processing-Library.git
+    git clone [https://github.com/nahmad2000/Digital-Image-Processing-Library.git](https://github.com/nahmad2000/Digital-Image-Processing-Library.git)
     cd Digital-Image-Processing-Library
     ```
+   
 2.  **Create a Virtual Environment (Recommended):**
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
     ```
+   
 3.  **Install Dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
+   
     *(Requires: streamlit, opencv-python, numpy, matplotlib, scikit-image, pandas, seaborn)*
 4.  **Run the App:**
     ```bash
     streamlit run main.py
     ```
+   
 5.  Open your web browser to the local URL provided by Streamlit (usually `http://localhost:8501`).
 
 > Enjoy exploring the world of digital image processing!
