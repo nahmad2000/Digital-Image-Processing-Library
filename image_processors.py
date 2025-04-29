@@ -12,6 +12,87 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from utils import calculate_metrics
 
+# Image Sharpening (Unsharp Masking)
+def sharpen_image(image, kernel_size=5, weight=1.5):
+    """Sharpen an image using Unsharp Masking.
+
+    Args:
+        image (numpy.ndarray): Input image
+        kernel_size (int): Size of the Gaussian kernel for blurring (must be odd).
+        weight (float): Weight of the detail image (original - blurred).
+
+    Returns:
+        numpy.ndarray: Sharpened image
+    """
+    # Ensure kernel size is odd
+    if kernel_size % 2 == 0:
+        kernel_size += 1
+
+    # Apply Gaussian blur
+    blurred = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
+
+    # Calculate the sharpened image using weighted addition
+    # sharpened = original + weight * (original - blurred)
+    sharpened = cv2.addWeighted(image, 1.0 + weight, blurred, -weight, 0)
+
+    return sharpened
+
+# Basic Thresholding
+def apply_threshold(image, threshold_value=127, threshold_type='binary',
+                    use_adaptive=False, adaptive_method='mean', block_size=11, C=2):
+    """Apply global or adaptive thresholding to an image.
+
+    Args:
+        image (numpy.ndarray): Input image.
+        threshold_value (int): Threshold value for global methods.
+        threshold_type (str): Type of global thresholding ('binary', 'binary_inv', 'trunc', 'tozero', 'tozero_inv').
+        use_adaptive (bool): If True, use adaptive thresholding.
+        adaptive_method (str): Adaptive method ('mean', 'gaussian').
+        block_size (int): Size of the pixel neighborhood area (must be odd).
+        C (int): Constant subtracted from the mean or weighted mean.
+
+    Returns:
+        numpy.ndarray: Thresholded image (grayscale).
+    """
+    # Convert to grayscale if color image
+    if len(image.shape) == 3:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        gray = image.copy()
+
+    # Map threshold type strings to OpenCV constants
+    thresh_types = {
+        'binary': cv2.THRESH_BINARY,
+        'binary_inv': cv2.THRESH_BINARY_INV,
+        'trunc': cv2.THRESH_TRUNC,
+        'tozero': cv2.THRESH_TOZERO,
+        'tozero_inv': cv2.THRESH_TOZERO_INV
+    }
+
+    # Map adaptive method strings to OpenCV constants
+    adaptive_methods = {
+        'mean': cv2.ADAPTIVE_THRESH_MEAN_C,
+        'gaussian': cv2.ADAPTIVE_THRESH_GAUSSIAN_C
+    }
+
+    if use_adaptive:
+        # Ensure block size is odd and > 1
+        if block_size <= 1: block_size = 3
+        if block_size % 2 == 0: block_size += 1
+
+        adaptive_thresh_type = thresh_types.get(threshold_type, cv2.THRESH_BINARY) # Adaptive usually uses binary or inv
+        adapt_method = adaptive_methods.get(adaptive_method, cv2.ADAPTIVE_THRESH_MEAN_C)
+
+        thresholded = cv2.adaptiveThreshold(gray, 255, adapt_method,
+                                            adaptive_thresh_type, block_size, C)
+    else:
+        thresh_type_flag = thresh_types.get(threshold_type, cv2.THRESH_BINARY)
+        _, thresholded = cv2.threshold(gray, threshold_value, 255, thresh_type_flag)
+
+    return thresholded
+
+
+
 # Downsampling & Interpolation Analysis
 def downsample_interpolate(image, downsample_method='area', scale_factor=0.5, 
                           interpolation_method='bicubic'):
@@ -287,6 +368,8 @@ def enhance_image(image, gamma=1.0, use_clahe=False, clip_limit=2.0,
             enhanced = cv2.equalizeHist(enhanced)
     
     return enhanced
+
+
 
 # Lighting Correction
 def correct_lighting(image, method='spatial', kernel_size=51, gamma=1.5, 

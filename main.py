@@ -327,8 +327,198 @@ def build_module_ui(module_name):
             )
             
             params['L2gradient'] = st.checkbox("Use L2 Gradient", value=False)
-    
+
+    # --- Add UI for Sharpening ---
+    elif module_name == "Sharpening":
+        st.subheader("Sharpening Settings")
+        col1, col2 = st.columns(2)
+        with col1:
+            params['kernel_size'] = st.slider(
+                "Blur Kernel Size (for Unsharp Mask)",
+                min_value=3, max_value=25, value=5, step=2
+            )
+        with col2:
+            params['weight'] = st.slider(
+                "Sharpening Weight",
+                min_value=0.1, max_value=5.0, value=1.5, step=0.1
+            )
+
+    # --- Add UI for Thresholding ---
+    elif module_name == "Thresholding":
+        st.subheader("Thresholding Settings")
+        # --- Change: Use a key for the checkbox to react to its changes ---
+        params['use_adaptive'] = st.checkbox("Use Adaptive Thresholding", value=False, key="adaptive_thresh_check")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if params['use_adaptive']:
+                params['adaptive_method'] = st.selectbox(
+                    "Adaptive Method", options=['mean', 'gaussian'], index=0
+                )
+                params['block_size'] = st.slider(
+                    "Block Size", min_value=3, max_value=31, value=11, step=2
+                )
+            else:
+                 params['threshold_value'] = st.slider(
+                     "Threshold Value", min_value=0, max_value=255, value=127
+                 )
+
+        with col2:
+             # --- Change: Dynamically set options based on 'use_adaptive' ---
+             if st.session_state.adaptive_thresh_check: # Check the state of the checkbox
+                 # Only show valid options for adaptive
+                 thresh_options = ['binary', 'binary_inv']
+                 params['threshold_type'] = st.selectbox(
+                     "Threshold Type (Adaptive)",
+                     options=thresh_options,
+                     index=0 # Default to binary
+                 )
+             else:
+                 # Show all options for global thresholding
+                 thresh_options = ['binary', 'binary_inv', 'trunc', 'tozero', 'tozero_inv']
+                 params['threshold_type'] = st.selectbox(
+                     "Threshold Type (Global)",
+                     options=thresh_options,
+                     index=0 # Default to binary
+                 )
+
+             if params['use_adaptive']: # Checkbox value directly from params is fine here
+                  params['C'] = st.slider(
+                      "Constant C (Subtracted)", min_value=-10, max_value=10, value=2
+                  )
+
+    # --- Add UI for Morphological Ops ---
+    elif module_name == "Morphological Ops":
+        st.subheader("Morphological Operation Settings")
+        col1, col2 = st.columns(2)
+        with col1:
+            params['operation'] = st.selectbox(
+                "Operation", options=['erode', 'dilate', 'open', 'close'], index=0
+            )
+            params['kernel_shape'] = st.selectbox(
+                "Kernel Shape", options=['rect', 'ellipse', 'cross'], index=0
+            )
+        with col2:
+            params['kernel_size'] = st.slider(
+                "Kernel Size", min_value=1, max_value=15, value=3, step=1 # Kernel size often odd, but allow even here
+            )
+            # Ensure kernel size is odd if needed by certain interpretations,
+            # but cv2 handles it. Let's keep slider simple.
+            # if params['kernel_size'] % 2 == 0: params['kernel_size']+=1 # Optional enforcement
+
+    # --- Add UI for Bilateral Filter ---
+    elif module_name == "Bilateral Filter":
+        st.subheader("Bilateral Filter Settings")
+        col1, col2 = st.columns(2)
+        with col1:
+            params['d'] = st.slider(
+                "Diameter (d)", min_value=3, max_value=15, value=9, step=2
+            )
+            params['sigma_color'] = st.slider(
+                "Sigma Color", min_value=10, max_value=150, value=75, step=5
+            )
+        with col2:
+            params['sigma_space'] = st.slider(
+                "Sigma Space", min_value=10, max_value=150, value=75, step=5
+            )
+
+    # --- Add UI for Color Space Conversion ---
+    elif module_name == "Color Space Conversion":
+        st.subheader("Color Space Conversion Settings")
+        col1, col2 = st.columns(2)
+        with col1:
+            params['target_space'] = st.selectbox(
+                "Target Color Space",
+                options=['BGR', 'RGB', 'GRAY', 'HSV', 'HLS', 'LAB', 'YCrCb'], index=3 # Default HSV
+            )
+        with col2:
+            # Option to view single channel (only if target space is not GRAY)
+            if params['target_space'] != 'GRAY':
+                channel_options = {
+                    'BGR': ['None', 'B (0)', 'G (1)', 'R (2)'],
+                    'RGB': ['None', 'R (0)', 'G (1)', 'B (2)'],
+                    'HSV': ['None', 'H (0)', 'S (1)', 'V (2)'],
+                    'HLS': ['None', 'H (0)', 'L (1)', 'S (2)'],
+                    'LAB': ['None', 'L* (0)', 'a* (1)', 'b* (2)'],
+                    'YCrCb': ['None', 'Y (0)', 'Cr (1)', 'Cb (2)']
+                }
+                view_channel_label = st.selectbox(
+                    "View Channel",
+                    options=channel_options.get(params['target_space'], ['None']), index=0
+                )
+                # Map label back to channel index or None
+                if view_channel_label == 'None':
+                    params['view_channel'] = None
+                else:
+                    try:
+                        # Extract index from label like 'H (0)' -> 0
+                        params['view_channel'] = int(view_channel_label.split('(')[1].split(')')[0])
+                    except:
+                        params['view_channel'] = None # Fallback
+            else:
+                params['view_channel'] = None # Cannot select channel for grayscale
+
+    # --- Add UI for Contour Detection ---
+    elif module_name == "Contour Detection":
+        st.subheader("Contour Detection Settings")
+        st.caption("Note: Finds contours on an automatically thresholded (Otsu) version of the image.")
+        col1, col2 = st.columns(2)
+        with col1:
+            params['mode'] = st.selectbox(
+                "Retrieval Mode",
+                options=['RETR_EXTERNAL', 'RETR_LIST', 'RETR_CCOMP', 'RETR_TREE'], index=0
+            )
+            params['method'] = st.selectbox(
+                "Approximation Method",
+                options=['CHAIN_APPROX_SIMPLE', 'CHAIN_APPROX_NONE'], index=0
+            )
+        with col2:
+            params['thickness'] = st.select_slider(
+                "Contour Thickness (-1=Fill)", options=[-1, 1, 2, 3, 5], value=2
+            )
+            params['min_area'] = st.number_input(
+                "Min Contour Area", min_value=0.0, value=0.0, step=10.0
+            )
+        # Basic color picker - could be more advanced
+        color_hex = st.color_picker("Contour Color", "#00FF00") # Green default
+        # Convert hex to BGR tuple
+        color_hex = color_hex.lstrip('#')
+        params['color'] = tuple(int(color_hex[i:i+2], 16) for i in (4, 2, 0)) # BGR order
+
+    # --- Add UI for Corner Detection ---
+    elif module_name == "Corner Detection":
+        st.subheader("Corner Detection Settings")
+        params['method'] = st.radio(
+            "Algorithm", options=['shi-tomasi', 'harris'], index=0, horizontal=True
+        )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if params['method'] == 'shi-tomasi':
+                params['max_corners'] = st.slider("Max Corners", 10, 500, 100)
+                params['quality_level'] = st.slider("Quality Level", 0.01, 0.2, 0.01, 0.01)
+                params['min_distance'] = st.slider("Min Distance", 1, 50, 10)
+            elif params['method'] == 'harris':
+                params['k'] = st.slider("Harris k", 0.01, 0.1, 0.04, 0.01)
+
+        with col2:
+            params['block_size'] = st.select_slider("Block Size", options=[3, 5, 7], value=3)
+            if params['method'] == 'harris':
+                params['ksize'] = st.select_slider("Sobel Aperture (ksize)", options=[3, 5, 7], value=3)
+
+        # Drawing options
+        col3, col4 = st.columns(2)
+        with col3:
+            corner_color_hex = st.color_picker("Corner Color", "#FF0000") # Red default
+            corner_color_hex = corner_color_hex.lstrip('#')
+            params['color'] = tuple(int(corner_color_hex[i:i+2], 16) for i in (4, 2, 0)) # BGR
+        with col4:
+            params['radius'] = st.slider("Corner Radius", 1, 10, 3)
+
+
     return params
+
+
 
 def apply_pipeline(image, pipeline_steps):
     """Apply a sequence of processing steps to an image.
@@ -470,7 +660,9 @@ def main():
             "Noise Analysis & Removal",
             "Image Enhancement",
             "Lighting Correction",
-            "Edge Detection"
+            "Edge Detection",
+            "Sharpening",
+            "Thresholding"
         ]
         
         selected_module = st.selectbox("Select Module", available_modules)
@@ -662,9 +854,32 @@ def main():
                                 caption="Original", width=400)
                     with col2:
                         st.image(processed_image, caption=f"{params['method']} Edges", width=400)
-            
+
+                elif selected_module == "Sharpening":
+                    processed_image = ip.sharpen_image(image, **params)
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if len(image.shape) == 3 else image,
+                                caption="Original", width=350)
+                    with col2:
+                        st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB) if len(processed_image.shape) == 3 else processed_image,
+                                caption="Sharpened", width=350)
+
+                # --- Add Preview for Thresholding ---
+                elif selected_module == "Thresholding":
+                    processed_image = ip.apply_threshold(image, **params)
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if len(image.shape) == 3 else image,
+                                caption="Original", width=350)
+                    with col2:
+                        st.image(processed_image, caption="Thresholded", width=350) # Display directly (grayscale)
+
+
+
             # Add to pipeline button
             if st.button("Add to Pipeline"):
+                func = None # Initialize func
                 # Create function and params tuple based on selected module
                 if selected_module == "Downsampling & Interpolation":
                     func = ip.downsample_interpolate
@@ -679,10 +894,19 @@ def main():
                     func = ip.correct_lighting
                 elif selected_module == "Edge Detection":
                     func = ip.detect_edges
+                elif selected_module == "Sharpening":
+                    func = ip.sharpen_image
+                elif selected_module == "Thresholding":
+                    func = ip.apply_threshold
                 
-                # Add to pipeline steps
-                st.session_state.pipeline_steps.append((func, params, selected_module))
-                st.success(f"Added {selected_module} to pipeline!")
+
+                if func is not None or selected_module == "Noise Analysis & Removal":
+                    st.session_state.pipeline_steps.append((func, params, selected_module))
+                    st.success(f"Added {selected_module} to pipeline!")
+                else:
+                    # This error shouldn't happen if all modules are mapped correctly
+                    st.error(f"Error: Could not find function mapping for {selected_module}. Check main.py.")
+
             
             # Display current pipeline
             if st.session_state.pipeline_steps:
