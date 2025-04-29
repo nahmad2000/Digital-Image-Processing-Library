@@ -47,7 +47,7 @@ If you want to run this application on your own computer:
 
 1.  **Clone the Repository:**
     ```bash
-    git clone <your-repository-url>
+    git clone https://github.com/nahmad2000/Digital-Image-Processing-Library.git
     cd DIP-Lib
     ```
 2.  **Create a Virtual Environment (Recommended):**
@@ -66,4 +66,4 @@ If you want to run this application on your own computer:
     ```
 5.  Open your web browser to the local URL provided by Streamlit (usually `http://localhost:8501`).
 
-Enjoy exploring the world of digital image processing!
+> Enjoy exploring the world of digital image processing!
