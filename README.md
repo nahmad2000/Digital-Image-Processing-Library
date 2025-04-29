@@ -48,7 +48,7 @@ If you want to run this application on your own computer:
 1.  **Clone the Repository:**
     ```bash
     git clone https://github.com/nahmad2000/Digital-Image-Processing-Library.git
-    cd DIP-Lib
+    cd Digital-Image-Processing-Library
     ```
 2.  **Create a Virtual Environment (Recommended):**
     ```bash
