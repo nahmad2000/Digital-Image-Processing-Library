@@ -2,7 +2,6 @@
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://digital-image-processing-library-nahmad.streamlit.app/)
 
-**Try it live now:** 👉 [https://digital-image-processing-library-nahmad.streamlit.app/](https://digital-image-processing-library-nahmad.streamlit.app/)
 
 ## What is DIP-Lib?
 
@@ -13,6 +12,24 @@ Whether you're learning about image processing, want to quickly test algorithms,
 * **See algorithms in action:** Adjust parameters with sliders and see how images change in real-time.
 * **Experiment quickly:** Stack multiple operations (like noise reduction followed by edge detection), reorder them, or remove them to compare results.
 * **Understand the process:** Visualize the output of each step in your custom image processing pipeline.
+
+---
+
+## 🚀 Live Demo
+
+**➡️ [Try the Live Demo!](https://frequency-decomposition-explorer-nahmad.streamlit.app/)**
+
+*(No installation required!)*
+
+## 🖼️ Sample Outputs
+
+![Demo 1](images/demo1.png) 
+![Demo 2](images/demo2.png)
+![Demo 2](images/demo3.png)
+
+**Try it live now:** 👉 [https://digital-image-processing-library-nahmad.streamlit.app/](https://digital-image-processing-library-nahmad.streamlit.app/)
+
+---
 
 ## How to Use the Live App
 

@@ -487,7 +487,7 @@ def main():
                 display_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             else:
                 display_image = image
-            st.image(display_image, use_column_width=True)
+            st.image(display_image, width=400)
             
             # Show image info
             st.write(f"Image Shape: {image.shape}")
@@ -508,10 +508,10 @@ def main():
                     col1, col2 = st.columns(2)
                     with col1:
                         st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if len(image.shape) == 3 and image.shape[2] == 3 else image, 
-                                caption="Original", use_column_width=True)
+                                caption="Original", width=400)
                     with col2:
                         st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB) if len(processed_image.shape) == 3 and processed_image.shape[2] == 3 else processed_image, 
-                                caption="Processed", use_column_width=True)
+                                caption="Processed", width=400)
                     
                     # Display metrics
                     st.write("Image Quality Metrics:")
@@ -525,10 +525,10 @@ def main():
                     col1, col2 = st.columns(2)
                     with col1:
                         st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if len(image.shape) == 3 and image.shape[2] == 3 else image, 
-                                caption="Original", use_column_width=True)
+                                caption="Original", width=400)
                     with col2:
                         st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB) if len(processed_image.shape) == 3 and processed_image.shape[2] == 3 else processed_image, 
-                                caption="Transformed", use_column_width=True)
+                                caption="Transformed", width=400)
                 
                 elif selected_module == "Noise Analysis & Removal":
                     # First add noise if requested
@@ -544,10 +544,10 @@ def main():
                         col1, col2 = st.columns(2)
                         with col1:
                             st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if len(image.shape) == 3 and image.shape[2] == 3 else image, 
-                                    caption="Original", use_column_width=True)
+                                    caption="Original", width=400)
                         with col2:
                             st.image(cv2.cvtColor(noisy_image, cv2.COLOR_BGR2RGB) if len(noisy_image.shape) == 3 and noisy_image.shape[2] == 3 else noisy_image, 
-                                    caption=f"{params['noise_type']} Noise", use_column_width=True)
+                                    caption=f"{params['noise_type']} Noise", width=400)
                         
                         # Calculate noise metrics
                         metrics = ip.calculate_metrics(image, noisy_image)
@@ -575,10 +575,10 @@ def main():
                             col1, col2 = st.columns(2)
                             with col1:
                                 st.image(cv2.cvtColor(noisy_image, cv2.COLOR_BGR2RGB) if len(noisy_image.shape) == 3 and noisy_image.shape[2] == 3 else noisy_image, 
-                                        caption="Noisy Image", use_column_width=True)
+                                        caption="Noisy Image", width=400)
                             with col2:
                                 st.image(cv2.cvtColor(filtered_image, cv2.COLOR_BGR2RGB) if len(filtered_image.shape) == 3 and filtered_image.shape[2] == 3 else filtered_image, 
-                                        caption=f"{params['filter_type']} Filtered", use_column_width=True)
+                                        caption=f"{params['filter_type']} Filtered", width=400)
                             
                             # Calculate filter metrics
                             metrics = ip.calculate_metrics(image, filtered_image)
@@ -609,10 +609,10 @@ def main():
                             col1, col2 = st.columns(2)
                             with col1:
                                 st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if len(image.shape) == 3 and image.shape[2] == 3 else image, 
-                                        caption="Original", use_column_width=True)
+                                        caption="Original", width=400)
                             with col2:
                                 st.image(cv2.cvtColor(filtered_image, cv2.COLOR_BGR2RGB) if len(filtered_image.shape) == 3 and filtered_image.shape[2] == 3 else filtered_image, 
-                                        caption=f"{params['filter_type']} Filtered", use_column_width=True)
+                                        caption=f"{params['filter_type']} Filtered", width=400)
                             
                             processed_image = filtered_image
                         else:
@@ -625,10 +625,10 @@ def main():
                     col1, col2 = st.columns(2)
                     with col1:
                         st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if len(image.shape) == 3 and image.shape[2] == 3 else image, 
-                                caption="Original", use_column_width=True)
+                                caption="Original", width=400)
                     with col2:
                         st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB) if len(processed_image.shape) == 3 and processed_image.shape[2] == 3 else processed_image, 
-                                caption="Enhanced", use_column_width=True)
+                                caption="Enhanced", width=400)
                     
                     # Display histograms
                     st.write("Histograms:")
@@ -647,10 +647,10 @@ def main():
                     col1, col2 = st.columns(2)
                     with col1:
                         st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if len(image.shape) == 3 and image.shape[2] == 3 else image, 
-                                caption="Original", use_column_width=True)
+                                caption="Original", width=400)
                     with col2:
                         st.image(cv2.cvtColor(processed_image, cv2.COLOR_BGR2RGB) if len(processed_image.shape) == 3 and processed_image.shape[2] == 3 else processed_image, 
-                                caption="Lighting Corrected", use_column_width=True)
+                                caption="Lighting Corrected", width=400)
                 
                 elif selected_module == "Edge Detection":
                     processed_image = ip.detect_edges(image, **params)
@@ -659,9 +659,9 @@ def main():
                     col1, col2 = st.columns(2)
                     with col1:
                         st.image(cv2.cvtColor(image, cv2.COLOR_BGR2RGB) if len(image.shape) == 3 and image.shape[2] == 3 else image, 
-                                caption="Original", use_column_width=True)
+                                caption="Original", width=400)
                     with col2:
-                        st.image(processed_image, caption=f"{params['method']} Edges", use_column_width=True)
+                        st.image(processed_image, caption=f"{params['method']} Edges", width=400)
             
             # Add to pipeline button
             if st.button("Add to Pipeline"):
@@ -703,7 +703,7 @@ def main():
                     # Remove the step (index is 0-based but display is 1-based)
                     st.session_state.pipeline_steps.pop(step_to_remove - 1)
                     st.success(f"Removed step {step_to_remove}")
-                    st.experimental_rerun()
+                    st.rerun()
                 
                 # Execute pipeline
                 if st.button("Execute Pipeline"):
@@ -723,7 +723,7 @@ def main():
                                 display_img = cv2.cvtColor(step_image, cv2.COLOR_BGR2RGB)
                             else:
                                 display_img = step_image
-                            st.image(display_img, caption=step_name, use_column_width=True)
+                            st.image(display_img, caption=step_name, width=400)
                     
                     # Calculate metrics for final result
                     if len(intermediate_results) > 1:
@@ -746,7 +746,7 @@ def main():
                 if st.button("Clear Pipeline"):
                     st.session_state.pipeline_steps = []
                     st.success("Pipeline cleared!")
-                    st.experimental_rerun()
+                    st.rerun()
         
         else:
             st.error("Failed to load image. Please try another file.")

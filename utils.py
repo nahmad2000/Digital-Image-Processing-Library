@@ -13,43 +13,99 @@ import pandas as pd
 import seaborn as sns
 
 def calculate_metrics(original, processed, metrics=None):
-    """Calculate image quality metrics.
-    
+    """Calculate image quality metrics. Handles color, grayscale, and potentially invalid inputs.
+
     Args:
         original (numpy.ndarray): Original image
         processed (numpy.ndarray): Processed image
         metrics (list): List of metrics to calculate ('psnr', 'ssim')
-        
+
     Returns:
         dict: Dictionary of calculated metrics
     """
     if metrics is None:
         metrics = ['psnr', 'ssim']
-    
+
     results = {}
-    
-    # Convert images to grayscale if they are color
+
+    # --- Start Changes ---
+    # Check if images are valid numpy arrays
+    if not isinstance(original, np.ndarray) or not isinstance(processed, np.ndarray):
+        results['error'] = "Invalid input image(s)."
+        return results
+
+    # Check if images have comparable dimensions (optional but good practice)
+    # if original.shape[:2] != processed.shape[:2]:
+    #     results['error'] = "Image dimensions do not match."
+    #     return results # Uncomment if strict dimension matching is needed
+
+    # Ensure images are grayscale for metrics calculation
     if len(original.shape) == 3 and original.shape[2] == 3:
         original_gray = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
-        processed_gray = cv2.cvtColor(processed, cv2.COLOR_BGR2GRAY)
-    else:
+    elif len(original.shape) == 2:
         original_gray = original
+    else:
+        results['error'] = "Unsupported original image format."
+        return results
+
+    if len(processed.shape) == 3 and processed.shape[2] == 3:
+        processed_gray = cv2.cvtColor(processed, cv2.COLOR_BGR2GRAY)
+    elif len(processed.shape) == 2:
         processed_gray = processed
-    
+    else:
+        # If processed image is not 2 or 3 channels, metrics might not be meaningful
+        # Allow calculation but note potential issues or return error
+        results['warning'] = "Processed image is not standard grayscale or BGR. Metrics might be unreliable."
+        # For metrics like PSNR/SSIM, comparing e.g. color to binary isn't standard.
+        # We'll attempt calculation assuming it's some form of single-channel data.
+        if len(processed.shape) > 2: # e.g. (H, W, 1)
+             processed_gray = processed.squeeze() if processed.shape[2] == 1 else None
+        else: # Unknown shape
+             processed_gray = None
+
+        if processed_gray is None or processed_gray.shape != original_gray.shape:
+             results['error'] = "Processed image format incompatible for metric calculation."
+             return results
+
+    # Resize processed_gray if dimensions mismatch after conversion (e.g. due to pipeline steps)
+    if original_gray.shape != processed_gray.shape:
+        processed_gray = cv2.resize(processed_gray, (original_gray.shape[1], original_gray.shape[0]), interpolation=cv2.INTER_NEAREST)
+        results['warning'] = results.get('warning', '') + " Processed image resized to match original for metrics."
+    # --- End Changes ---
+
+
     # Calculate PSNR
     if 'psnr' in metrics:
         try:
-            results['psnr'] = psnr(original_gray, processed_gray)
+            # Ensure data types match, PSNR works on uint8 usually
+            if original_gray.dtype != processed_gray.dtype:
+                 processed_gray = processed_gray.astype(original_gray.dtype)
+
+            # PSNR calculation needs a data range. Assume standard 8-bit if not specified.
+            data_range = np.iinfo(original_gray.dtype).max - np.iinfo(original_gray.dtype).min if np.issubdtype(original_gray.dtype, np.integer) else 1.0
+            results['psnr'] = psnr(original_gray, processed_gray, data_range=data_range)
         except Exception as e:
             results['psnr'] = f"Error: {str(e)}"
-    
+
     # Calculate SSIM
     if 'ssim' in metrics:
         try:
-            results['ssim'] = ssim(original_gray, processed_gray)
+            # Ensure data types match
+            if original_gray.dtype != processed_gray.dtype:
+                 processed_gray = processed_gray.astype(original_gray.dtype)
+
+            # SSIM calculation needs a data range.
+            data_range = np.iinfo(original_gray.dtype).max - np.iinfo(original_gray.dtype).min if np.issubdtype(original_gray.dtype, np.integer) else 1.0
+            # SSIM might need multichannel=False explicitly for grayscale
+            win_size = min(7, original_gray.shape[0], original_gray.shape[1]) # Window size must be odd and <= image dimensions
+            if win_size % 2 == 0: win_size -= 1
+            if win_size >= 3:
+                results['ssim'] = ssim(original_gray, processed_gray, data_range=data_range, win_size=win_size)
+            else:
+                results['ssim'] = "Error: Image too small for SSIM calculation"
         except Exception as e:
             results['ssim'] = f"Error: {str(e)}"
-    
+
     return results
 
 def plot_comparison(images, titles=None, figsize=(12, 8)):
